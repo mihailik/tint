@@ -7,6 +7,13 @@ module.exports.handler = async function (event, context) {
 
   return {
     statusCode: 200,
-    body: JSON.stringify(event, null, 2)
+    body: JSON.stringify({
+      ...event,
+      multiValueHeaders: void 0,
+      multiValueQueryStringParameters: void 0,
+      requestContext: {
+        ...event.requestContext
+      }
+    }, null, 2)
   };
 };
