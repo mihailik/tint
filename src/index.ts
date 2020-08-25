@@ -18,8 +18,8 @@
     document.body.appendChild(el);
     for (let i = 0; i < 5; i++) {
         await new Promise(resolve => setTimeout(resolve, 1000));
-        el.textContent = `Loading ${5 - i}...`;
+        el.textContent = document.title = `Loading ${5 - i}...`;
     }
     await new Promise(resolve => setTimeout(resolve, 1000));
-    el.textContent = 'DONE!';
+    el.textContent = document.title = 'DONE!';
 })();
