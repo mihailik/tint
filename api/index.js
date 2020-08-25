@@ -1,3 +1,6 @@
 module.exports.handler = async function (event, context) {
-    return 'OK done.';
+  return {
+    statusCode: 200,
+    body: 'OK done.'
+  };
 };
