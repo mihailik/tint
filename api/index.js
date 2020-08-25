@@ -1,6 +1,6 @@
 // @ts-check
 
-import url from 'url';
+const url = require('url');
 
 /** @type {import('aws-lambda').APIGatewayProxyHandler} */
 module.exports.handler = async function (event, context) {
