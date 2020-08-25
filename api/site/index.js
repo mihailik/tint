@@ -32,8 +32,8 @@ module.exports.handler = async function (event, context) {
 
   if (isPng) {
     const pngjs = require('pngjs');
-    const w = 600;
-    const h = 400;
+    const w = 300;
+    const h = 200;
     const largePNG = new pngjs.PNG({
       width: w,
       height: h
