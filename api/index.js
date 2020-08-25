@@ -1,7 +1,7 @@
 // @ts-check
 
-const url = require('url');
-const { request } = require('http');
+const fs = require('fs');
+const { findColor, colors } = require('./colors');
 
 /** @type {import('aws-lambda').APIGatewayProxyHandler} */
 module.exports.handler = async function (event, context) {
@@ -10,14 +10,80 @@ module.exports.handler = async function (event, context) {
   if (!requestContext) requestContext = /** @type {*} */({});
   const pageURL = process.env.URL + (/^\//.test(event.path) ? event.path.slice(1) : event.path);
 
+  let isPng = false;
+  const colorStr = event.path.split('/').slice(-1)[0].replace(/.png$/i, () => {
+    isPng = true;
+    return '';
+  });
+
+  const matchColors = findColor(colorStr);
+  if (!matchColors || !matchColors.length) {
+    const colorList = Object.keys(colors);
+    const randomColor = colorList[Math.floor(Math.random() * colorList.length)];
+    return {
+      statusCode: 302,
+      headers: {
+        location: pageURL.slice(0, pageURL.length - colorStr.length) + '/' + randomColor
+      },
+      body: ''
+    };
+  }
+
+  if (isPng) {
+    const pngjs = require('pngjs');
+    const w = 600;
+    const h = 400;
+    const largePNG = new pngjs.PNG({
+      width: w,
+      height: h
+    });
+
+    const border = Math.max(w / 20, h / 20) | 0;
+    const mainColor = parseInt(matchColors[0].color.slice(1), 16);
+    const r = (mainColor & 0xFF0000) >> 16;
+    const g = (mainColor & 0x00FF00) >> 8;
+    const b = mainColor & 0x0000FF;
+    const contrast = (r + g + b) / 3 < 128 ? 0xFF : 0x00;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const idx = ((y * w) + x) * 4;
+        largePNG.data[idx + 3] = 255;
+        if (Math.min(x, w - x, y, h - y) < border) {
+          largePNG.data[idx] = largePNG.data[idx + 1] = largePNG.data[idx + 2] = contrast;
+        }
+        else {
+          largePNG.data[idx] = r;
+          largePNG.data[idx + 1] = g;
+          largePNG.data[idx + 2] = b;
+        }
+      }
+    }
+
+    const pngBuf = pngjs.PNG.sync.write(largePNG);
+    return {
+      statusCode: 200,
+      headers: {
+        contentType: 'image/png'
+      },
+      body: pngBuf.toString('base64'),
+      isBase64Encoded: true
+    };
+  }
+
+  const indexHTMLContent = fs.readFileSync('../dist/index.html').toString('utf8');
+  const injected = indexHTMLContent.replace(
+    /(\<meta\s+name="twitter:image"\s+content=")([^\"])(">)/,
+    (match, lead, content, trail) => {
+      return lead + pageURL + '.png' + trail;
+    }
+  );
+
   return {
     statusCode: 200,
-    body: JSON.stringify({
-      pageURL,
-      event: safeObj(event, ['multiValueHeaders', 'multiValueQueryStringParameters']),
-      context: safeObj(context),
-      env: safeObj(process.env)
-    }, null, 2)
+    body: injected,
+    headers: {
+      contentType: 'text/html'
+    }
   };
 };
 
