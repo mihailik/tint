@@ -1,7 +1,9 @@
 // @ts-check
 
 const fs = require('fs');
+const path = require('path');
 const { findColor, colors } = require('./colors');
+const { SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS } = require('constants');
 
 /** @type {import('aws-lambda').APIGatewayProxyHandler} */
 module.exports.handler = async function (event, context) {
@@ -70,7 +72,7 @@ module.exports.handler = async function (event, context) {
     };
   }
 
-  const indexHTMLContent = fs.readFileSync('../dist/index.html').toString('utf8');
+  const indexHTMLContent = fs.readFileSync(path.resolve(__dirname, './dist/index.html')).toString('utf8');
   const injected = indexHTMLContent.replace(
     /(\<meta\s+name="twitter:image"\s+content=")([^\"])(">)/,
     (match, lead, content, trail) => {
