@@ -12,7 +12,11 @@ module.exports.handler = async function (event, context) {
       multiValueHeaders: void 0,
       multiValueQueryStringParameters: void 0,
       requestContext: {
-        ...event.requestContext
+        ...event.requestContext,
+        domainName: event.requestContext.domainName,
+        domainPrefix: event.requestContext.domainPrefix,
+        httpMethod: event.requestContext.httpMethod,
+        resourcePath: event.requestContext.resourcePath
       }
     }, null, 2)
   };
