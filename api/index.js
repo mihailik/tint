@@ -1,9 +1,13 @@
 // @ts-check
 
 const url = require('url');
+const { request } = require('http');
 
 /** @type {import('aws-lambda').APIGatewayProxyHandler} */
 module.exports.handler = async function (event, context) {
+
+  let requestContext = event.requestContext;
+  if (!requestContext) requestContext = /** @type {*} */({});
 
   return {
     statusCode: 200,
@@ -12,11 +16,14 @@ module.exports.handler = async function (event, context) {
       multiValueHeaders: void 0,
       multiValueQueryStringParameters: void 0,
       requestContext: {
-        ...event.requestContext,
-        domainName: event.requestContext.domainName,
-        domainPrefix: event.requestContext.domainPrefix,
-        httpMethod: event.requestContext.httpMethod,
-        resourcePath: event.requestContext.resourcePath
+        ...requestContext,
+        domainName: requestContext.domainName,
+        domainPrefix: requestContext.domainPrefix,
+        httpMethod: requestContext.httpMethod,
+        resourcePath: requestContext.resourcePath
+      },
+      'context.clientContext': {
+        ...(context && context.clientContext)
       }
     }, null, 2)
   };
