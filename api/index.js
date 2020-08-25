@@ -13,7 +13,8 @@ module.exports.handler = async function (event, context) {
     statusCode: 200,
     body: JSON.stringify({
       event: safeObj(event, ['multiValueHeaders', 'multiValueQueryStringParameters']),
-      context: safeObj(context)
+      context: safeObj(context),
+      env: safeObj(process.env)
     }, null, 2)
   };
 };
