@@ -1,4 +1,4 @@
-import { findColor } from '../api/colors';
+import { findColor } from '../api/site/colors';
 
 let pageColors = detectCurrentPageColors();
 
@@ -53,7 +53,7 @@ function detectCurrentPageColors() {
   for (const t of trySources) {
     if (!t) continue;
 
-    const colors = findColor(t) as (import('../api/colors').ColorMatch[] & { sourceText?: string });
+    const colors = findColor(t) as (import('../api/site/colors').ColorMatch[] & { sourceText?: string });
     if (colors.length) {
       colors.sourceText = t;
       return colors;

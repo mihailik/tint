@@ -1,10 +1,10 @@
 [[redirects]]
   from = "/*"
   # to = "/index.html"
-  to = "/.netlify/functions/index"
+  to = "/.netlify/functions/site/index"
   status = 200
 
 [build]
   command = "npm run build"
   functions = "api"
-  publish = "/api/dist"
+  publish = "/api/site/dist"
