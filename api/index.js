@@ -8,7 +8,7 @@ module.exports.handler = async function (event, context) {
 
   let requestContext = event.requestContext;
   if (!requestContext) requestContext = /** @type {*} */({});
-  const { URL: pageURL } = process.env;
+  const pageURL = process.env.URL + /^\//.test(event.path) ? event.path.slice(1) : event.path;
 
   return {
     statusCode: 200,
