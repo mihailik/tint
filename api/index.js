@@ -8,10 +8,12 @@ module.exports.handler = async function (event, context) {
 
   let requestContext = event.requestContext;
   if (!requestContext) requestContext = /** @type {*} */({});
+  const { URL: pageURL } = process.env;
 
   return {
     statusCode: 200,
     body: JSON.stringify({
+      pageURL,
       event: safeObj(event, ['multiValueHeaders', 'multiValueQueryStringParameters']),
       context: safeObj(context),
       env: safeObj(process.env)
