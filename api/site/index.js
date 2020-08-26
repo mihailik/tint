@@ -125,6 +125,18 @@ module.exports.handler = async function (event, context) {
       (match, lead, content, trail) => {
         return lead + `type="image/png" href="${pageURL}64x64.png"` + trail;
       }
+    )
+    .replace(
+      /Tint Color Picker/g,
+      matchColors && matchColors.length ?
+        `${matchColors[0].name} - Tint Color Picker` :
+        `(${colorStr}?) Tint Color Picker`
+    )
+    .replace(
+      /Pick colors!/g,
+      matchColors && matchColors.length ?
+        `${matchColors[0].name} ${matchColors[0].color}` + (matchColors.length == 1 ? `` : ` and ${matchColors.length-1} more...`) :
+        `Pick colors! Is ${colorStr} a color name?`
     );
 
   return {
