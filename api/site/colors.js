@@ -16,6 +16,8 @@ module.exports.findColor = function findColor(colorText) {
   /** @type {ColorMatch[] | undefined} */
   let weakMatches;
 
+  colorText = decodeURIComponent(colorText);
+
   const lowercaseColorText = colorText.toLowerCase();
   const strongColorText = colorText.replace(/\([^)]\)/g, '').toLowerCase();
   const colorParts = strongColorText.split(/[^a-z]+/g);

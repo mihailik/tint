@@ -14,7 +14,7 @@ module.exports.handler = async function (event, context) {
   let isPng = false;
   let pngWidth = 800;
   let pngHeight = 600;
-  const colorStr = event.path.split('/').slice(-1)[0]
+  const colorStr = decodeURIComponent(event.path.split('/').slice(-1)[0]
     .replace(/.png$/i, () => {
       isPng = true;
       return '';
@@ -23,7 +23,7 @@ module.exports.handler = async function (event, context) {
       pngWidth = parseInt(width, 10);
       pngHeight = parseInt(height, 10);
       return '';
-    });
+    }));
 
   const matchColors = findColor(colorStr);
   if (!matchColors || !matchColors.length) {

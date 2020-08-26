@@ -34,11 +34,15 @@ colorText.textContent = pageColors.sourceText || pageColors[0].name;
 wrapperDiv.appendChild(colorText);
 for (let i = 1; i < pageColors.length; i++) {
   const clr = pageColors[i];
-  const altColorText = document.createElement('div');
-  altColorText.textContent = clr.name;
-  altColorText.style.borderLeft = 'solid 1em ' + clr.color;
-  altColorText.style.paddingLeft = '0.5em';
-  wrapperDiv.appendChild(altColorText);
+  const altColorContainer = document.createElement('div');
+  const altColorLink = document.createElement('a');
+  altColorLink.textContent = clr.name;
+  altColorLink.style.borderLeft = 'solid 1em ' + clr.color;
+  altColorLink.style.paddingLeft = '0.5em';
+  altColorLink.style.color = 'inherit';
+  altColorLink.href = './' + clr.name;
+  altColorContainer.appendChild(altColorLink);
+  wrapperDiv.appendChild(altColorContainer);
 }
 
 document.body.appendChild(wrapperDiv);
@@ -55,7 +59,7 @@ function detectCurrentPageColors() {
 
     const colors = findColor(t) as (import('../api/site/colors').ColorMatch[] & { sourceText?: string });
     if (colors.length) {
-      colors.sourceText = t;
+      colors.sourceText = decodeURIComponent(t);
       return colors;
     }
   }
