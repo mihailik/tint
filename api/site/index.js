@@ -64,7 +64,7 @@ module.exports.handler = async function (event, context) {
       height: pngHeight
     });
 
-    const border = Math.max(pngWidth / 20, pngHeight / 20) | 0;
+    const border = Math.max(pngWidth / 20, pngHeight / 20, 1) | 0;
     const mainColor = parseInt(matchColors[0].color.slice(1), 16);
     const r = (mainColor & 0xFF0000) >> 16;
     const g = (mainColor & 0x00FF00) >> 8;
