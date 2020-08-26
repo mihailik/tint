@@ -47,7 +47,16 @@ module.exports.handler = async function (event, context) {
   if (isPng) {
     if (!etagPNG)
       etagPNG = fs.readFileSync(__filename + '.etag', 'utf8');
-    // check if need to return short-circuited
+
+    if (event.headers['if-none-match'] === etagPNG) {
+      return {
+        statusCode: 304,
+        headers: {
+          ETag: etagPNG
+        },
+        body: void 0
+      };
+    }
 
     const pngjs = require('pngjs');
     const largePNG = new pngjs.PNG({
@@ -81,9 +90,8 @@ module.exports.handler = async function (event, context) {
     return {
       statusCode: 200,
       headers: {
-        contentType: 'image/png',
-        etag: etagPNG,
-        xEventHeaders: Object.keys(event.headers).join(' ')
+        'Content-Type': 'image/png',
+        ETag: etagPNG
       },
       body: pngBuf.toString('base64'),
       isBase64Encoded: true
@@ -94,7 +102,15 @@ module.exports.handler = async function (event, context) {
   if (!etagHTML)
     etagHTML = fs.readFileSync(indexHTMLPath + '.etag', 'utf8');
 
-  // TODO: check if need to return short-circuit
+    if (event.headers['if-none-match'] === etagHTML) {
+      return {
+        statusCode: 304,
+        headers: {
+          ETag: etagHTML
+        },
+        body: void 0
+      };
+    }
 
   const indexHTMLContent = fs.readFileSync(indexHTMLPath).toString('utf8');
   const injected = indexHTMLContent
@@ -115,8 +131,8 @@ module.exports.handler = async function (event, context) {
     statusCode: 200,
     body: injected,
     headers: {
-      contentType: 'text/html',
-      etag: etagHTML
+      'Content-Type': 'text/html',
+      ETag: etagHTML
     }
   };
 };
