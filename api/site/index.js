@@ -86,7 +86,7 @@ module.exports.handler = async function (event, context) {
       }
     )
     .replace(
-      /(\<link\s+rel="icon"\s+)([^>])(\s*\>)/,
+      /(\<link\s+rel="icon"\s+)([^>]+)(\s*\>)/,
       (match, lead, content, trail) => {
         return lead + `type="image/png" href="${pageURL}64x64.png"` + trail;
       }
