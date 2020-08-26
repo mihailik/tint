@@ -38,7 +38,7 @@ module.exports.handler = async function (event, context) {
     return {
       statusCode: 302,
       headers: {
-        location: pageURL.slice(0, pageURL.length - colorStr.length) + '/' + randomColor
+        location: joinSlash(pageURL.slice(0, pageURL.length - colorStr.length), randomColor)
       },
       body: ''
     };
