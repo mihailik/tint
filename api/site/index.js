@@ -74,7 +74,7 @@ module.exports.handler = async function (event, context) {
       for (let x = 0; x < pngWidth; x++) {
         const idx = ((y * pngWidth) + x) * 4;
         largePNG.data[idx + 3] = 255;
-        if (Math.min(x, pngWidth - x, y, pngHeight - y) < border) {
+        if (Math.min(x, pngWidth - 1 - x, y, pngHeight - 1 - y) < border) {
           largePNG.data[idx] = largePNG.data[idx + 1] = largePNG.data[idx + 2] = contrast;
         }
         else {
