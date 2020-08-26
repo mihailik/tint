@@ -18,7 +18,7 @@ module.exports.handler = async function (event, context) {
   const pageURL = (process.env.URL + '/' + event.path).replace(/\/\/+/g, '/');
 
   let isPng = false;
-  let pngWidth = 800;
+  let pngWidth = 1200;
   let pngHeight = 600;
   const colorStr = decodeURIComponent(event.path.split('/').slice(-1)[0]
     .replace(/.png$/i, () => {
