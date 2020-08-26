@@ -12,10 +12,18 @@ module.exports.handler = async function (event, context) {
   const pageURL = (process.env.URL + '/' + event.path).replace(/\/\/+/g, '/');
 
   let isPng = false;
-  const colorStr = event.path.split('/').slice(-1)[0].replace(/.png$/i, () => {
-    isPng = true;
-    return '';
-  });
+  let pngWidth = 800;
+  let pngHeight = 600;
+  const colorStr = event.path.split('/').slice(-1)[0]
+    .replace(/.png$/i, () => {
+      isPng = true;
+      return '';
+    })
+    .replace(/(\d+)x(\d+)/, (match, width, height) => {
+      pngWidth = parseInt(width, 10);
+      pngHeight = parseInt(height, 10);
+      return '';
+    });
 
   const matchColors = findColor(colorStr);
   if (!matchColors || !matchColors.length) {
@@ -32,24 +40,22 @@ module.exports.handler = async function (event, context) {
 
   if (isPng) {
     const pngjs = require('pngjs');
-    const w = 300;
-    const h = 200;
     const largePNG = new pngjs.PNG({
-      width: w,
-      height: h
+      width: pngWidth,
+      height: pngHeight
     });
 
-    const border = Math.max(w / 20, h / 20) | 0;
+    const border = Math.max(pngWidth / 20, pngHeight / 20) | 0;
     const mainColor = parseInt(matchColors[0].color.slice(1), 16);
     const r = (mainColor & 0xFF0000) >> 16;
     const g = (mainColor & 0x00FF00) >> 8;
     const b = mainColor & 0x0000FF;
     const contrast = (r + g + b) / 3 < 128 ? 0xFF : 0x00;
-    for (let y = 0; y < h; y++) {
-      for (let x = 0; x < w; x++) {
-        const idx = ((y * w) + x) * 4;
+    for (let y = 0; y < pngHeight; y++) {
+      for (let x = 0; x < pngWidth; x++) {
+        const idx = ((y * pngWidth) + x) * 4;
         largePNG.data[idx + 3] = 255;
-        if (Math.min(x, w - x, y, h - y) < border) {
+        if (Math.min(x, pngWidth - x, y, pngHeight - y) < border) {
           largePNG.data[idx] = largePNG.data[idx + 1] = largePNG.data[idx + 2] = contrast;
         }
         else {
@@ -72,12 +78,19 @@ module.exports.handler = async function (event, context) {
   }
 
   const indexHTMLContent = fs.readFileSync(require.resolve('./dist/index.html')).toString('utf8');
-  const injected = indexHTMLContent.replace(
-    /(\<meta\s+name="twitter:image"\s+content=")([^\"]+)(">)/,
-    (match, lead, content, trail) => {
-      return lead + pageURL + '.png' + trail;
-    }
-  );
+  const injected = indexHTMLContent
+    .replace(
+      /(\<meta\s+name="twitter:image"\s+content=")([^\"]+)(">)/,
+      (match, lead, content, trail) => {
+        return lead + pageURL + '.png' + trail;
+      }
+    )
+    .replace(
+      /(\<link\s+rel="icon"\s+)([^>])(\s*\>)/,
+      (match, lead, content, trail) => {
+        return lead + `type="image/png" href="${pageURL}64x64.png"` + trail;
+      }
+    );
 
   return {
     statusCode: 200,
