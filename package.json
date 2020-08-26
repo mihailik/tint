@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "parcel start src/index.html",
-    "build": "parcel build src/index.html -d ./api/site/dist",
+    "build": "parcel build src/index.html -d ./api/site/dist && node ./src/mark-etag.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

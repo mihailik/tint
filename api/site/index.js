@@ -4,6 +4,12 @@ const fs = require('fs');
 const { findColor, colors } = require('./colors');
 const { SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS } = require('constants');
 
+/** @type {string | undefined} */
+let etagHTML;
+
+/** @type {string | undefined} */
+let etagPNG;
+
 /** @type {import('aws-lambda').APIGatewayProxyHandler} */
 module.exports.handler = async function (event, context) {
 
@@ -39,6 +45,10 @@ module.exports.handler = async function (event, context) {
   }
 
   if (isPng) {
+    if (!etagPNG)
+      etagPNG = fs.readFileSync(__filename + '.etag', 'utf8');
+    // check if need to return short-circuited
+
     const pngjs = require('pngjs');
     const largePNG = new pngjs.PNG({
       width: pngWidth,
@@ -67,17 +77,26 @@ module.exports.handler = async function (event, context) {
     }
 
     const pngBuf = pngjs.PNG.sync.write(largePNG);
+
     return {
       statusCode: 200,
       headers: {
-        contentType: 'image/png'
+        contentType: 'image/png',
+        etag: etagPNG,
+        xEventHeaders: Object.keys(event.headers).join(' ')
       },
       body: pngBuf.toString('base64'),
       isBase64Encoded: true
     };
   }
 
-  const indexHTMLContent = fs.readFileSync(require.resolve('./dist/index.html')).toString('utf8');
+  const indexHTMLPath = require.resolve('./dist/index.html');
+  if (!etagHTML)
+    etagHTML = fs.readFileSync(indexHTMLPath + '.etag', 'utf8');
+
+  // TODO: check if need to return short-circuit
+
+  const indexHTMLContent = fs.readFileSync(indexHTMLPath).toString('utf8');
   const injected = indexHTMLContent
     .replace(
       /(\<meta\s+name="twitter:image"\s+content=")([^\"]+)(">)/,
@@ -96,7 +115,8 @@ module.exports.handler = async function (event, context) {
     statusCode: 200,
     body: injected,
     headers: {
-      contentType: 'text/html'
+      contentType: 'text/html',
+      etag: etagHTML
     }
   };
 };
