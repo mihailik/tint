@@ -115,11 +115,11 @@ module.exports.handler = async function (event, context) {
   const indexHTMLContent = fs.readFileSync(indexHTMLPath).toString('utf8');
   const injected = indexHTMLContent
     .replace(
-      /(\<meta\s+name="twitter:image"\s+content=")([^\"]+)(">)/,
-      (match, lead, content, trail) => {
+      /(\<meta\s+property="(twitter\:image|twitter\:meta-image-default|og:image)"\s+content=")([^\"]+)(">)/g,
+      (match, lead, tag, content, trail) => {
         return lead + pageURL + '.png' + trail;
       }
-    )
+    )    
     .replace(
       /(\<link\s+rel="icon"\s+)([^>]+)(\s*\>)/,
       (match, lead, content, trail) => {
