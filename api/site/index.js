@@ -15,7 +15,7 @@ module.exports.handler = async function (event, context) {
 
   let requestContext = event.requestContext;
   if (!requestContext) requestContext = /** @type {*} */({});
-  const pageURL = (process.env.URL + '/' + event.path).replace(/\/\/+/g, '/');
+  const pageURL = joinSlash(process.env.URL, event.path);
 
   let isPng = false;
   let pngWidth = 1200;
@@ -191,4 +191,17 @@ function safeObj(obj, except, levels, risk) {
     else
       return typeof obj;
   }
+}
+
+/**
+ * @param {string} lead
+ * @param {string} trail
+ */
+function joinSlash(lead, trail) {
+  const leadSlashed = /\/$/.test(lead);
+  const trailSlashed = /^\//.test(trail);
+
+  if (leadSlashed !== trailSlashed) return lead + trail;
+  if (leadSlashed) return lead + trail.slice(1);
+  else return lead + '/' + trail;
 }
