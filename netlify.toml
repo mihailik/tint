@@ -3,6 +3,11 @@
   # to = "/index.html"
   to = "/.netlify/functions/site/index"
   status = 200
+
+[[redirects]]
+  from = "/index.html"
+  to = "/.netlify/functions/site/index"
+  status = 200
   force = true
 
 [build]
